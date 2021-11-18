@@ -31,6 +31,7 @@ import numpy as np
 from matplotlib import figure, axes
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import locale
 from matplotlib.colors import LinearSegmentedColormap, Colormap
 
 
@@ -380,8 +381,9 @@ class Echogram(object):
         try:
             x = self.axes.get_xticks()[0]
             dt = x.astype('datetime64[ms]').astype('object')
+            # date_format = locale.nl_langinfo(locale.D_FMT)
 
-            x_label = dt.strftime("%m-%d-%Y")
+            x_label = dt.strftime("%d-%m-%Y")
         except:
             x_label = ''
         self.axes.set_xlabel(x_label)
