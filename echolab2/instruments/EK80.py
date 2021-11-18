@@ -557,6 +557,12 @@ class EK80(object):
                 raw.trim()
             if channel_id in self.raw_tx:
                 self.raw_tx[channel_id].trim()
+            if len(self.raw_data[channel_id]) == 0:
+                print(f'\nWarning, no data in channel {channel_id}, removing\n')
+                del self.raw_data[channel_id]
+                self.channel_ids.remove(channel_id)
+
+
         self.nmea_data.trim()
         self.motion_data.trim()
         self.annotations.trim()
