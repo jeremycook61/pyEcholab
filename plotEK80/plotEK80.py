@@ -6,9 +6,36 @@ from echolab2.processing import afsc_bot_detector
 import pandas as pd
 import os
 
+# For combined cm
+import numpy as np
+import colorsys
+import matplotlib as mpl
+
 def ensureDir(path): # create subdirectory to be used for plots
     if not os.path.exists(path):
         os.makedirs(path)
+
+def combinedCM(N=52,plot=False):
+    # Definition of LSSS's combined colormap
+    # Start and end values from Inge Kristian Eliassen
+    start = {'H':300,'S':0.1,'B':1}
+    end = {'H':0,'S':1,'B':0.5}
+    
+    colorsHSB = {}
+    for typ in start.keys():
+        for k in range(N):
+            colorsHSB[typ] = np.linspace(start[typ],end[typ],N)
+            
+    colorsRGB = []
+    for k in range(N):
+        colorsRGB.append(colorsys.hsv_to_rgb(colorsHSB['H'][k]/360.0,colorsHSB['S'][k],colorsHSB['B'][k]))
+    
+    mycmap =  mpl.colors.ListedColormap(colorsRGB, name='combined')
+    
+    if plot:
+        plt.imshow([np.arange(0,1,0.01)]*10,aspect='auto',cmap=mycmap)
+        
+    return mycmap
 
 def plotEK80(files,fig_obj=None, outfolder='.', nav_file=None):
     # FM data
@@ -54,6 +81,10 @@ def plotEK80(files,fig_obj=None, outfolder='.', nav_file=None):
     ## Plot power from the specified ping from all channels.
     #for channel_id in ek80obj.channel_ids:
     
+    # LSSS colors
+    ek_cmap = combinedCM()
+    ek_cmap.set_under('w', alpha=1.0)
+
     #  info ~ num chans
     print("N channels = %d" % len(ek80obj.channel_ids))
     fig = plt.figure()
@@ -73,7 +104,7 @@ def plotEK80(files,fig_obj=None, outfolder='.', nav_file=None):
         # Create echogram plot.
         # fig = plt.figure()
         plt.clf()
-        eg = echogram.Echogram(fig, Sv, threshold=[-82, -30])
+        eg = echogram.Echogram(fig, Sv, threshold=[-82, -30], cmap = ek_cmap)
         titstr = 'Sv Echogram, %s' % channel_id
         eg.axes.set_title( titstr )
         plt.savefig(out_filename)
