@@ -91,22 +91,23 @@ def plotEK80(files,fig_obj=None, outfolder='.', nav_file=None):
 
     # Plot power from the specified ping from all channels.
     for channel_id in ek80obj.channel_ids:
-        channel_name = channel_id.replace(" ", "_").replace("|", "_")
-        channel_folder = os.path.join(outfolder, channel_name)
-        out_filename= os.path.join(channel_folder, f'{name}_{channel_name}.png')
-        ensureDir(channel_folder)
-        # Get a reference to the raw data for this channel.
-        raw_data = ek80obj.raw_data[channel_id][0]
+        if channel_id in ek80obj.frequency_map[38000.0]: # Just processing 38kHz
+            channel_name = channel_id.replace(" ", "_").replace("|", "_")
+            channel_folder = os.path.join(outfolder, channel_name)
+            out_filename= os.path.join(channel_folder, f'{name}_{channel_name}.png')
+            ensureDir(channel_folder)
+            # Get a reference to the raw data for this channel.
+            raw_data = ek80obj.raw_data[channel_id][0]
 
-        # Convert from raw power to Sv.
-        Sv = raw_data.get_Sv()
+            # Convert from raw power to Sv.
+            Sv = raw_data.get_Sv()
 
-        # Create echogram plot.
-        # fig = plt.figure()
-        plt.clf()
-        eg = echogram.Echogram(fig, Sv, threshold=[-82, -30], cmap = ek_cmap)
-        titstr = 'Sv Echogram, %s' % channel_id
-        eg.axes.set_title( titstr )
-        plt.savefig(out_filename)
-        # fig.show()
-        # End iteration through channel ids.
+            # Create echogram plot.
+            # fig = plt.figure()
+            plt.clf()
+            eg = echogram.Echogram(fig, Sv, threshold=[-82, -30], cmap = ek_cmap)
+            titstr = 'Sv Echogram, %s' % channel_id
+            eg.axes.set_title( titstr )
+            plt.savefig(out_filename)
+            # fig.show()
+            # End iteration through channel ids.
